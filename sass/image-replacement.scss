@@ -1,0 +1,33 @@
+
+// ------------------------------------------------------------
+//          SASS Image replacement
+// This snippet uses the power of compass to create the
+// easiest method ever for css image-replacement.
+// Instead of knowing the image size and position we
+// let compass measure that for us so that even if the
+// the image changes, no manual adjustment is required
+// in the css.
+//
+// Usage:
+//   .selector {
+//     @include ir('image-name.png');
+//   }
+//
+// See the input arguments to force width, height or position
+// -----------------------------------------------------------
+
+@import "compass";
+
+@mixin ir($img, $width: image-width($img), $height: image-height($img), $x: 50%, $y: 50%) {
+  background: {
+    image: image-url($img);
+    repeat: no-repeat;
+    position: $x $y;
+  };
+  width: $width;
+  height: $height;
+  text-indent: $width;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+}

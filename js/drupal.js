@@ -1,0 +1,77 @@
+(function($) {
+  'use strict';
+
+  // imageOverlay
+  // -----------------
+  // This script is taken from Sasson, our themer's tool-kit for Drupal.
+  // It will add a draggable overlay image you can lay over your HTML
+  // for easy visual comparison.
+  // Image source and opacity are set via Drupal theme settings form
+  Drupal.behaviors.imageOverlay = {
+    attach: function(context, settings) {
+
+      $('body.with-overlay').once('overlay-image').each(function() {
+        // Create overlay markup and styles.
+        var body = $(this);
+        var overlay = $('<div id="overlay-image"><img src="'+ Drupal.settings.sasson.overlay_url +'"/></div>');
+        var overlayToggle = $('<div class="toggle-switch toggle-overlay off" ><div>' + Drupal.t('Overlay') + '</div></div>');
+        body.append(overlay);
+        body.append(overlayToggle);
+        // Styles could be done in CSS but keeping them here allow us to remove
+        // them when the feature is not needed.
+        overlay.css({
+          'opacity': Drupal.settings.sasson.overlay_opacity,
+          'display': 'none',
+          'position': 'absolute',
+          'z-index': 99998,
+          'text-align': 'center',
+          'top': $('.region-page-top').position() ? $('.region-page-top').position().top : 0,
+          'left': '50%',
+          'cursor': 'move'
+        });
+        overlayToggle.css({
+          'top': '90px'
+        });
+        // Overlay on/off switch
+        overlayToggle.click(function() {
+          $('body').toggleClass('show-overlay');
+          overlay.fadeToggle();
+          var pull = overlay.find('img').width() / -2 + "px";
+          overlay.css("marginLeft", pull);
+          $(this).toggleClass("off");
+        });
+        overlay.draggable();
+
+        // Move overlay with arrows.
+        $(document).keydown(function(e) {
+          if ($('body').is('.show-overlay')) {
+
+            switch(e.which) {
+              case 37: // left
+                overlay.animate({'left': '-=1'}, 10);
+              break;
+
+              case 38: // up
+                overlay.animate({'top': '-=1'}, 10);
+              break;
+
+              case 39: // right
+                overlay.animate({'left': '+=1'}, 10);
+              break;
+
+              case 40: // down
+                overlay.animate({'top': '+=1'}, 10);
+              break;
+
+              default: return;
+            }
+            e.preventDefault();
+          }
+        });
+
+      });
+
+    }
+  };
+
+})(jQuery);

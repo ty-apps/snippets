@@ -1,0 +1,170 @@
+// ----------------------------------------------
+//                  Layout
+// Just a bunch of very useful sass layout mixins
+// ----------------------------------------------
+
+
+// Settings
+$container: 960px !default;
+
+$flow: left !default;
+$opos: if($flow == left, right, left);
+
+
+// px2perc
+// -------
+// Convert width in px to % relative to a container.
+// Makes it easier to work with PSD measurements.
+// - $px  : width in px of the measured element
+// - $parent  : width in px of the container.
+@function px2perc($px, $parent: $container){
+  @return ($px / $parent) * 100%;
+}
+
+
+// Clear
+// -----
+// The "Clearfix" hack. as a mixin and a transparent class.
+// See http://nicolasgallagher.com/micro-clearfix-hack/
+@mixin clear {
+  &:after {
+    content: " ";
+    display: table;
+    clear: both;
+  }
+}
+%clear {
+  @include clear;
+}
+
+
+// Size
+// ----
+// Easily set width and height by units or by image dimensions.
+// See https://coderwall.com/p/2k3rgw
+// - $x  : a unit or an image name
+// - $y  : a unit or an image name
+@mixin size($x, $y: $x) {
+  @if type_of($x) == string {
+    width: image-width($x);
+  } @else {
+    width: $x;
+  }
+  @if type_of($y) == string {
+    height: image-height($y);
+  } @else {
+    height: $y;
+  }
+}
+
+
+// Justified layout
+// ----------------
+// Grid justified layout. as a mixin and a transparent class.
+// See http://www.barrelny.com/blog/text-align-justify-and-rwd/
+@mixin layout-justify {
+  text-align: justify;
+
+  > * {
+    display: inline-block;
+  }
+
+  &:after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    height: 0;
+    font-size: 0;
+  }
+}
+%layout-justify {
+  @include layout-justify;
+}
+
+
+// Container
+// ---------
+// Layout container.
+// - $max-width  : container max width (for fluid layouts).
+@mixin container($max-width: 100%) {
+  width: $container;
+  max-width: $max-width;
+  margin: {
+    left: auto;
+    right: auto;
+  }
+  @include clear;
+}
+
+// Span (floats)
+// -------------
+// Salsa (Susy with isolation) style layout mixin. simplified.
+// See http://tsi.github.io/salsa-test/
+// - $width  : element width as a fraction or unit.
+// - $position  : element position as a fraction or unit.
+@mixin span($width, $position: false) {
+
+  @include box-sizing(border-box);
+
+  // Width (fraction/units)
+  @if not unitless($width){ // arbitrary width (e.g. px/%/em etc.).
+    width: $width;
+  }
+  @else if round($width) != $width { // fraction (e.g. 1/5).
+    width: 100% * $width;
+  }
+  @else { // just a fallback.
+    width: $width;
+  }
+
+  // Position (omega/row/fraction/columns/units)
+  @if $position != omega {
+    float: $flow; // normal float
+  }
+  @if $position == omega { // omega
+    float: $opos;
+  }
+
+  @else if $position == row { // row
+    clear: both;
+  }
+  @else if $position {
+    margin: {
+      #{$opos}: -100%;
+      @if not unitless($width) { // has unit, arbitrary width
+        #{$flow}: $position;
+      }
+      @else if round($position) != $position { // fraction
+        #{$flow}: $position * 100%;
+      }
+      @else { // fallback
+        #{$flow}: $position;
+      }
+    }
+  }
+}
+
+
+// Span (inline-blocks)
+// -------------------
+// Layout mixin. using inline-blocks.
+// See http://tsi.github.io/salsa-test/
+// - $width  : element width as a fraction or unit.
+// - $valign  : vertical align value.
+@mixin span-ib($width, $valign: top) {
+  display: inline-block;
+
+  // Width (fraction/units)
+  @if not unitless($width){ // arbitrary width (e.g. px/%/em etc.).
+    width: $width;
+  }
+  @else if round($width) != $width { // fraction (e.g. 1/5).
+    width: 100% * $width;
+  }
+  @else { // just a fallback.
+    width: $width;
+  }
+
+  vertical-align: $valign;
+  @include box-sizing(border-box);
+}
